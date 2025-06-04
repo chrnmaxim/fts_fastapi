@@ -1,3 +1,5 @@
+"""Модуль конфигурации базы данных."""
+
 from sqlalchemy import AsyncAdaptedQueuePool, MetaData
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
