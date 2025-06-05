@@ -6,6 +6,9 @@ Create Date: 2025-06-04 21:13:38.929632+00:00
 
 """
 
+import json
+import os
+import uuid
 from typing import Sequence, Union
 
 import sqlalchemy as sa
@@ -73,6 +76,21 @@ def upgrade() -> None:
         FOR EACH ROW EXECUTE FUNCTION update_search_vector_in_posts();
         """
     )
+
+    # Добавление постов из фикстуры в БД
+    fixtures_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "fixtures")
+    posts_path = os.path.join(fixtures_path, "posts.json")
+    with open(file=posts_path, encoding="utf-8") as json_data:
+        posts_data = json.load(json_data)
+
+        for category in posts_data:
+            for content in posts_data[category]:
+                op.execute(
+                    f"""
+                    INSERT INTO posts (id, category, content)
+                    VALUES ('{uuid.uuid4()}', '{category}', '{content}')
+                    """
+                )
 
 
 def downgrade() -> None:
