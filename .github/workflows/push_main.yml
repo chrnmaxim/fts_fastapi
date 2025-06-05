@@ -1,0 +1,41 @@
+name: Push in PR into main branch. Linter and Backend tests.
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  linter:
+    name: Backend Ruff checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.6.16"
+
+      - name: Set up Python
+        run: uv python install
+
+      - name: Ruff checks
+        run: uvx ruff@0.9.1 check . && uvx ruff@0.9.1 check --select I . && uvx ruff@0.9.1 format --check .
+
+  backend_tests:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    needs: linter
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Copy env.examples
+        run: |
+          cp -r src/.env.test.example src/.env.test
+
+      - name: Tests in Docker Containers
+        run: |
+          make test
