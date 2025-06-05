@@ -17,3 +17,5 @@ RUN if [ "$ENV" = "dev" ]; then \
 COPY . /app
 
 ENV PATH="/app/.venv/bin:$PATH"
+
+RUN chmod +x run.sh

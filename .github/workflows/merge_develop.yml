@@ -1,0 +1,32 @@
+name: Merge into develop. Build and Push Docker Image to Yandex Container Registry.
+
+on:
+  pull_request:
+    branches:
+      - develop
+    types:
+      - closed
+
+jobs:
+  build_and_push_to_container_registry:
+    name: Push Docker image to Yandex Container Registry
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Add app version from Git commit
+        shell: bash
+        run: |
+          APP_VERSION=$(git describe --always --dirty --tags --long)
+          sed -i "/^    APP_VERSION: str =/s/=.*/= \"$APP_VERSION\"/" src/config.py
+
+      - name: Login to Yandex Container Registry
+        run: |
+          echo ${{ secrets.YC_OAUTH_TOKEN}} | docker login --username oauth --password-stdin cr.yandex
+
+      - name: Build and Push to Yandex Container Registry
+        run: |
+          docker build --build-arg ENV=dev -t cr.yandex/${{ secrets.YC_CONTAINER_REGISTRY_ID}}/fts-fast-api:latest ./
+          docker push cr.yandex/${{ secrets.YC_CONTAINER_REGISTRY_ID}}/fts-fast-api:latest
