@@ -1,0 +1,32 @@
+[project]
+name = "fts-fastapi"
+version = "0.1.0"
+description = "FTS Project Template"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "asyncpg>=0.30.0",
+    "fastapi[all]>=0.115.12",
+    "sqlalchemy[asyncio]>=2.0.41",
+]
+
+[dependency-groups]
+dev = [
+    "alembic>=1.16.1",
+    "ruff>=0.11.12",
+    "tzdata>=2025.2",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"env.py" = ["F401", "F811"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "B"]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.params.Depends",
+    "fastapi.Query",
+    "fastapi.params.Query",
+]
