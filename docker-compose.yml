@@ -1,0 +1,56 @@
+# MARK: Base
+x-postgres-base: &postgres-base
+  image: postgres:16
+  restart: always
+  healthcheck:
+    test:
+      - CMD-SHELL
+      - pg_isready -U postgres
+    interval: 10s
+    timeout: 5s
+    retries: 5
+
+x-app-base: &app-base
+  build:
+    context: ./
+  restart: always
+
+# MARK: Dev
+services:
+  postgres_fts:
+    profiles: ["dev"]
+    <<: *postgres-base
+    env_file: "./src/.env"
+    ports:
+      - 7432:5432
+    expose:
+      - 5432
+    volumes:
+      - ./docker/postgres/docker-entrypoint-initdb.d/:/docker-entrypoint-initdb.d/
+      - pgdata_fts:/var/lib/postgresql/data
+    networks:
+      - fts_fastapi
+
+  fts_fastapi:
+    profiles: ["dev"]
+    <<: *app-base
+    command: uvicorn src.main:app --reload --host 0.0.0.0 --port 8000 --loop uvloop
+    env_file: "./src/.env"
+    volumes:
+      - ./:/app
+      - /app/.venv
+    ports:
+      - 8000:8000
+    expose:
+      - 8000
+    depends_on:
+      postgres_fts:
+        condition: service_healthy
+    networks:
+      - fts_fastapi
+
+volumes:
+  pgdata_fts:
+
+networks:
+  fts_fastapi:
