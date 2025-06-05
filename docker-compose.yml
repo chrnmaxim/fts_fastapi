@@ -49,8 +49,39 @@ services:
     networks:
       - fts_fastapi
 
+
+# MARK: Test
+  postgres_fts_test:
+    profiles: ["test"]
+    <<: *postgres-base
+    env_file: "./src/.env.test"
+    networks:
+      - test
+
+  fts_fastapi_test:
+    profiles: ["test"]
+    <<: *app-base
+    command: sh -c "
+      alembic upgrade heads &&
+      coverage run --source='.' \
+      -m pytest \
+      -s -r A \
+      --rootdir=/app/ \
+      --disable-pytest-warnings && \
+      coverage html"
+    env_file: "./src/.env.test"
+    volumes:
+      - ./:/app
+      - /app/.venv
+    depends_on:
+      postgres_fts_test:
+        condition: service_healthy
+    networks:
+      - test
+
 volumes:
   pgdata_fts:
 
 networks:
   fts_fastapi:
+  test:

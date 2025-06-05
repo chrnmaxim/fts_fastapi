@@ -9,6 +9,13 @@
 [![Static Badge](https://img.shields.io/badge/docker-257bd6?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
 
+## О проекте
+Проект предназначен для реализации полнотекстового поиска в PostgresSQL c использованием FastAPI и SQLAlchemy.
+
+В качестве примера в проекте создаётся таблица `posts` с постами различных категорий.
+Полнотекстовый поиск реализован за счёт создания индекса на поле `search_vector` типа `TSVECTOR`, значение которого обновляется при добавлении записи в таблицу `posts` или обновлении текста в поле `content` у существующей записи с помощью триггера на стороне БД.
+
+
 ## Установка и запуск проекта
 
 1. Установить [uv](https://docs.astral.sh/uv/getting-started/installation/).
@@ -50,3 +57,16 @@ docker compose exec fts_fastapi alembic upgrade heads
 ```bash
 make stop_dev
 ```
+
+## Тесты
+1. Перед запуском тестов необходимо создать `.env.test` на основе`.env.test.example`:
+```bash
+cp -r src/.env.test.example src/.env.test
+```
+
+2. Тесты запускаются из независимой базы данных Postgres с помощью команды `make test`.
+
+3. После выполнения тестов в файле `htmlcov/index.html` можно увидеть отчет о покрытии кода тестами.
+
+> [!NOTE]
+> Тесты запускаются в GitHub Actions с каждым коммитом в открытом Pull Request в ветку `develop` или `main`.

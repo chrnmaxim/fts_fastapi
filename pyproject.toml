@@ -13,6 +13,9 @@ dependencies = [
 [dependency-groups]
 dev = [
     "alembic>=1.16.1",
+    "coverage>=7.8.2",
+    "pytest==7.2.1",
+    "pytest-asyncio==0.20.3",
     "ruff>=0.11.12",
     "tzdata>=2025.2",
 ]
@@ -30,3 +33,11 @@ extend-immutable-calls = [
     "fastapi.Query",
     "fastapi.params.Query",
 ]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = "tests"
+addopts = [
+    "--import-mode=importlib"
+]
+asyncio_mode = "auto"
