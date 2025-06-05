@@ -1,15 +1,19 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.dependencies import get_session
 from src.posts.schemas import PostListReadSchema, PostQuerySchema
 from src.posts.service import PostService
 
-posts_router = APIRouter(prefix="/post", tags=["Посты"])
+posts_router = APIRouter(prefix="/posts", tags=["Посты"])
 
 
 # MARK: Get
-@posts_router.get(path="", summary="Получить список постов")
+@posts_router.get(
+    path="",
+    summary="Получить список постов",
+    status_code=status.HTTP_200_OK,
+)
 async def get_posts_route(
     query: PostQuerySchema = Query(),
     session: AsyncSession = Depends(get_session),

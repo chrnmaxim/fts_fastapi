@@ -14,5 +14,8 @@ stop_local_db:
 	docker compose -f docker-compose.yml down postgres_fts
 remove_local_db:
 	docker compose -f docker-compose.yml down -v postgres_fts
+test:
+	docker compose -f docker-compose.yml run --rm fts_fastapi_test
+	docker compose -f docker-compose.yml --profile test down --volumes
 migrate:
 	uv run alembic upgrade heads
